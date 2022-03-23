@@ -1,0 +1,201 @@
+&&&.........Test Case - Check Equality.......... &&&&&&
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using NUnit.Framework;
+namespace DemoAppCore
+{
+    [TestFixture]
+    class FunctionalTest
+    {
+         [Test]
+         public void Addition_AddingOfTwoNumbers_ReturnTrue(){
+             var result=Program.AddNumbers(1,2);
+             Assert.That(result,Is.EqualTo(3));
+         }
+         [Test]
+         public void Subtract_SubtractionOfTwoNumbers_ReturnTrue(){
+             var result=Program.SubNumbers(2,1);
+             Assert.That(result,Is.EqualTo(1));
+         }
+         [Test]
+         public void Multiplication_MultiplicationOfTwoNumbers_ReturnTrue(){
+             var result=Program.MulNumbers(1,2);
+             Assert.That(result,Is.EqualTo(2));
+         }
+         [Test]
+         public void Division_DivisionOfTwoNumbers_ReturnTrue(){
+             var result=Program.DivNumbers(3,2);
+             Assert.That(result,Is.EqualTo(1));
+         }
+    }
+}
+
+###################################################################
+&&&&..........Test Case - Check Object..............&&&&&
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using NUnit.Framework;
+
+namespace DemoAppCore
+{
+    //Add required NUnit test attribute
+    [TestFixture]
+    class FunctionalTest
+    {
+        //Add required test methods
+        [Test]
+        public void Employee_e1_null()   
+        {            
+            Assert.That(Program.e1,Is.Null);
+        }
+        [Test]
+        public void Employee_EnrollEmployee()
+        {
+            Employee result = Program.EnrollEmployee();
+            Assert.That(result,Is.Not.Null);
+            Assert.AreEqual(result.Name,"Tom");
+            Assert.AreEqual(result.Id,"A1234");
+        }
+    }
+}
+
+#####################################################################
+
+&&&&&...........Test Case - Conditional Statement...........&&&&&&
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using NUnit.Framework;
+
+namespace DemoAppCore
+{
+    //Add required NUnit test attribute
+    [TestFixture]
+    class FunctionalTest
+    {
+        //Add required test methods
+        [Test]
+        [TestCase(38,"FAIL")]
+        [TestCase(75,"PASS")]
+        public void CalculateGrade_CheckConditions_ReturnsGrade1(float mark,string result)
+        {
+            var ans = Program.CalculateGrade(mark);
+            Assert.That(ans,Is.EqualTo(result));
+        }
+    }
+}
+############################################################################
+
+&&&&&........Test Case - String Compare......&&&&
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using NUnit.Framework;
+
+namespace DemoAppCore
+{
+    //Add required NUnit test attribute
+    [TestFixture]
+    class FunctionalTest
+    {
+        [Test]
+        //Add required test methods
+         public void FinalMessageTest_CheckingStringWithTotal_ReturnsTrue(){
+            var str=Program.FinalMessage();
+            StringAssert.Contains("total",str);
+        }
+        [Test]
+        public void FinalMessageTest_CheckingStringWith7600_ReturnsTrue(){
+            var str=Program.FinalMessage();
+            StringAssert.Contains("7600",str);
+        }
+    }
+}
+
+#####################################################################
+
+&&&&&&.........Test Case - Collections.........&&&&&
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using NUnit.Framework;
+
+namespace DemoAppCore
+{
+    //Add required NUnit test attribute
+    [TestFixture]
+    class FunctionalTest
+    {
+        //Add required test methods
+        [Test]
+         public void FinalList_Variable_CheckIsNull()
+        {
+            var ans = Program.names;
+            Assert.That(ans,Is.Null);
+        }
+        [Test]
+        public void FinalList_WhenInvoked_CheckUnique()
+        {
+            var ans = Program.FinalList();
+            CollectionAssert.AllItemsAreUnique(ans);
+        }
+        [Test]
+        public void FinalList_WhenInvoked_CheckEqual()
+        {
+            var ans = Program.FinalList();
+            CollectionAssert.AreEqual("Peter",ans[0]);
+        }
+    }
+}
+
+#####################################################################
+&&&&&......Purchase Asset......&&&&&
+
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using NUnit.Framework;
+
+namespace AssetProject
+{
+    //Add required NUnit test attribute
+    [TestFixture]
+    public class FunctionalTest
+    {
+        //Add required test methods
+        [Test]
+        public void TestValidAsset_CheckingValidateAsset_ReturnsTrue() {
+            var a = new Asset() {
+            Cost = 5000
+                
+            };
+         var b = new AssetBO();
+         var result = b.ValidateAsset(a);
+         Assert.That(result, Is.EqualTo("Asset Valid"));
+     }
+    
+        [Test]
+        public void TestInValidAsset_CheckingValidateAsset_ReturnsException() {
+          try {
+          var a = new Asset() {
+             Cost = 500
+           };
+           var b = new AssetBO();
+            var result = b.ValidateAsset(a);
+            var ex = new InvalidCostException();
+            Assert.That(() => result, Throws.InvalidOperationException);
+          } catch (Exception ex) {}
+        }
+    }
+}
+
+###########################################################################
+
