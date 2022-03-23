@@ -1,0 +1,146 @@
+SQL SERVER HANDSON:-
+###########################################################
+create table orders(
+ord_no numeric(5) primary key,
+purch_amt decimal(8,2),
+ord_date date,
+customer_id numeric(5),
+salesman_id numeric(5) constraint ct foreign key(salesman_id)
+references salesman(salesman_id)
+);
+go
+
+############################################################
+
+ALTER TABLE Supplier
+ADD CHECK(LEN(contact)=10);
+
+########################################################
+
+SELECT a.deptname as "Worker Department", a.location as Location, b.deptname as "Manager Department"
+from department a join department b on a.admrdept=b.deptno and a.admrdept!=a.deptno
+order by a.deptname;
+go
+
+##############################################################
+
+select concat(a.lastname," works for ",b.lastname) as Hierarchy
+from
+(select e.lastname,e.empno,e.job,d.mgrno 
+from employee e
+join department d on e.workdept=d.deptno)
+as a join
+(select e.lastname,e.empno,e.job,d.mgrno
+from employee e
+join department d on e.workdept=d.deptno)
+as b on a.mgrno=b.empno 
+where a.mgrno!=a.empno
+order by a.lastname
+go
+
+##################################################################
+
+create proc EmployeesDept(@DeptNo varchar) as
+begin
+select lastname as Name from Employee
+where workdept='D21'
+end
+go
+
+##############################################################
+
+create procedure AvailableDepartments
+as 
+select deptname as Name from Department
+go
+
+################################################################
+
+select e.firstname, e.lastname, e.salary from employee e
+join department d on e.workdept=d.deptno where d.location  = "New York"
+order by e.firstname;
+go
+
+###########################################################
+
+create procedure
+EmployeeCount
+(
+@deptno char(3),
+@total_employees int output
+)
+As 
+Begin 
+select @total_employees=count(empno) from employee where workdept=@deptno
+return @total_employees
+End
+Go
+
+#####################################################################
+
+create trigger claim_audits
+on dbo.claims
+for insert
+as
+declare @name varchar(30)
+declare @total_amount varchar(25)
+select @name=(select c.first_name 
+    from customer c 
+    join customer_policy cp
+    on c.id=cp.customer_id 
+    join claims cl 
+    on cp.id=cl.customer_policy_id,inserted i 
+    where cl.id=i.id)
+select @total_amount=(select cl.amount_of_claim +i.amount_of_claim+50000 
+    from inserted i, claims cl 
+    join customer_policy cp 
+    on cl.customer_policy_id=cp.id 
+    where i.id=cl.id)
+--select @total_amount=(select premium_amount from customer_policy)
+insert into dbo.claim_audit(customer_name,amount_of_claim,action) select @name,@total_amount,'Updated customer claimed amount';
+GO
+
+########################################################################
+
+Declare @deptname varchar(30),@empcount int;
+declare emp_cursor cursor for
+select deptname, count(empno)
+from employee e join department d on e.workdept=d.deptno
+group by deptname
+having count(empno)>1;
+open emp_cursor
+fetch next from emp_cursor
+into @deptname,@empcount
+while @@FETCH_STATUS=0
+BEGIN
+print CAST(@deptname as varchar(30))+' department has ' +CAST(@empcount as varchar)+'employees'
+fetch next from emp_cursor
+into @deptname,@empcount
+END
+CLOSE emp_cursor;
+DEALLOCATE emp_cursor
+GO
+
+############################################################################
+
+CREATE PROCEDURE delete_status
+@status_id int
+as
+IF EXISTS (SELECT * FROM agent WHERE id = @status_id)
+    insert into status_error_log(error_msg) values("child records existing in claims table");
+else IF EXISTS (SELECT * FROM address WHERE id = @status_id)
+    insert into status_error_log(error_msg) values("child records existing in claims table");
+else IF EXISTS (SELECT * FROM customer WHERE id = @status_id)
+    insert into status_error_log_table(error_msg) values("child records existing in claims table");
+else IF EXISTS (SELECT * FROM insurance_company WHERE id = @status_id)
+    insert into status_error_log_table(error_msg) values("child records existing in claims table");
+else IF EXISTS (SELECT * FROM policy WHERE id = @status_id)
+    insert into status_error_log(error_msg) values("child records existing in claims table");
+else IF EXISTS (SELECT * FROM customer_policy WHERE id = @status_id)
+    insert into status_error_log(error_msg) values("child records existing in claims table");
+else IF EXISTS (SELECT * FROM claims WHERE id = @status_id)
+    insert into status_error_log(error_msg) values("child records existing in claims table");
+else
+    delete from status where id=@status_id;
+GO
+###########################################################################
